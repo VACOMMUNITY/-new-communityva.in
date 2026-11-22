@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUp, ArrowUpRight, Mail, MapPin, Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Mail, MapPin, Send, Loader2, CheckCircle2, AlertCircle, Instagram, Download } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { OFFICIAL_COMMUNITY_EMAIL, OFFICIAL_MAILTO_LINK } from "@/lib/constants";
@@ -157,6 +157,17 @@ export default function FinalScene() {
             </p>
 
             <div className="space-y-3 pt-4 text-xs font-mono text-white/80">
+                            <div className="flex items-center gap-2">
+                <Instagram className="w-4 h-4 text-pink-400" />
+                <a 
+                  href="https://www.instagram.com/community.va/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-pink-400 transition-colors"
+                >
+                  @community.va
+                </a>
+              </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-brand-blue" />
                 <a href={OFFICIAL_MAILTO_LINK} className="hover:text-brand-blue-light transition-colors">
@@ -291,7 +302,16 @@ export default function FinalScene() {
             © 2026 COMMUNITY.VA • Hyderabad, Telangana, India. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-6">
+            <a 
+              href="https://www.instagram.com/community.va/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center gap-1.5 text-pink-400 hover:text-pink-300 transition-colors font-bold"
+            >
+              <Instagram className="w-3.5 h-3.5" />
+              <span>Instagram</span>
+            </a>
             <Link href="/login" className="hover:text-white transition-colors">
               Portal Login
             </Link>

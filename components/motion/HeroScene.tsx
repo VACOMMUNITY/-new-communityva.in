@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, MapPin } from "lucide-react";
+import { ArrowDown, ArrowUpRight, MapPin, Instagram, Download } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -84,13 +84,25 @@ export default function HeroScene() {
 
         {/* Top Metadata Row */}
         <div ref={metaRef} className="flex items-center justify-between z-10 pt-16 sm:pt-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-brand-border text-xs font-mono font-medium tracking-wide text-brand-dark shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
-            <span className="flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-brand-red" /> HYDERABAD, INDIA
-            </span>
-            <span className="text-brand-grey">•</span>
-            <span className="text-brand-grey">EST. 2026</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-brand-border text-xs font-mono font-medium tracking-wide text-brand-dark shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-brand-red" /> HYDERABAD, INDIA
+              </span>
+              <span className="text-brand-grey">•</span>
+              <span className="text-brand-grey">EST. 2026</span>
+            </div>
+
+            <a
+              href="https://www.instagram.com/community.va/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-50 border border-pink-200 text-xs font-mono font-bold text-pink-700 hover:bg-pink-100 transition-colors shadow-xs"
+            >
+              <Instagram className="w-3.5 h-3.5 text-pink-600" />
+              <span>@community.va</span>
+            </a>
           </div>
 
           <div className="hidden md:flex items-center gap-4 text-xs font-mono text-brand-grey uppercase tracking-widest">
@@ -140,6 +152,17 @@ export default function HeroScene() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
+            <a
+              href="https://www.instagram.com/community.va/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-pink-600 via-purple-600 to-orange-500 text-white rounded-full font-display text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-all shadow-md group"
+            >
+              <Instagram className="w-4 h-4 text-white" />
+              <span>Instagram @community.va</span>
+              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </a>
+
             <Link
               href="/register"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-brand-dark text-white rounded-full font-display text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-black transition-all shadow-sm group"
@@ -148,6 +171,13 @@ export default function HeroScene() {
               <ArrowUpRight className="w-4 h-4 text-brand-blue-light transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
 
+            <Link
+              href="/institutional-deck"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-white border border-brand-border text-brand-dark rounded-full font-display text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-neutral-50 transition-all shadow-xs group"
+            >
+              <Download className="w-4 h-4 text-brand-dark" />
+              <span>Download Institutional Deck</span>
+            </Link>
             <Link
               href="#community-story"
               className="inline-flex items-center gap-2 px-6 py-3.5 bg-white border border-brand-border text-brand-dark rounded-full font-display text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-brand-bg-alt transition-all"

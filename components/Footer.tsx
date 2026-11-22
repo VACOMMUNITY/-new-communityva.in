@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUp, Mail, MapPin } from "lucide-react";
+import { ArrowUp, Mail, MapPin, Instagram } from "lucide-react";
 import { OFFICIAL_COMMUNITY_EMAIL, OFFICIAL_MAILTO_LINK } from "@/lib/constants";
 
 export default function Footer() {
@@ -98,10 +98,19 @@ export default function Footer() {
               </li>
             </ul>
 
-            <div className="pt-4 border-t border-white/10">
+                        <div className="pt-4 border-t border-white/10 space-y-2">
               <span className="block font-mono text-[11px] text-white/50 uppercase mb-1">
-                Official Inquiries:
+                Connect on Social & Email:
               </span>
+              <a
+                href="https://www.instagram.com/community.va/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1.5 transition-colors"
+              >
+                <Instagram className="w-3.5 h-3.5 text-pink-400" />
+                <span>@community.va (Instagram)</span>
+              </a>
               <a
                 href={OFFICIAL_MAILTO_LINK}
                 className="font-mono text-xs text-brand-blue-light hover:underline flex items-center gap-1.5"

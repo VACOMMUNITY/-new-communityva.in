@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X, ArrowUpRight, LogIn } from "lucide-react";
+import { Menu, X, ArrowUpRight, LogIn, Instagram } from "lucide-react";
 
 const NAV_SCENES = [
   { label: "01 — COMMUNITY", href: "/#community-story" },
   { label: "02 — WHAT WE DO", href: "/#activities" },
   { label: "03 — ECOSYSTEM", href: "/#join" },
   { label: "04 — EVENTS", href: "/events" },
+  { label: "05 — DECK", href: "/institutional-deck" },
   { label: "05 — JOIN US", href: "/register" },
   { label: "CONTACT", href: "/#contact" },
 ];
@@ -65,6 +66,17 @@ export default function CinematicNavbar() {
 
           {/* Action CTAs */}
           <div className="hidden md:flex items-center gap-3">
+            <a
+              href="https://www.instagram.com/community.va/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-orange-500/10 border border-pink-300 text-xs font-mono font-bold text-pink-700 hover:text-pink-900 hover:border-pink-400 hover:bg-pink-50 transition-all shadow-xs"
+              title="Follow us on Instagram @community.va"
+            >
+              <Instagram className="w-3.5 h-3.5 text-pink-600" />
+              <span>@community.va</span>
+            </a>
+
             <Link
               href="/login"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-brand-border text-xs font-mono font-bold uppercase text-brand-dark hover:bg-white transition-colors"
@@ -84,6 +96,15 @@ export default function CinematicNavbar() {
 
           {/* Mobile Menu Button */}
           <div className="flex lg:hidden items-center gap-2">
+            <a
+              href="https://www.instagram.com/community.va/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-1.5 rounded-full border border-pink-300 text-pink-600 bg-pink-50"
+              title="Instagram"
+            >
+              <Instagram className="w-4 h-4" />
+            </a>
             <Link
               href="/register"
               className="px-3 py-1.5 rounded-full bg-brand-blue text-white text-[11px] font-mono font-bold uppercase"
@@ -118,6 +139,15 @@ export default function CinematicNavbar() {
               </Link>
             ))}
             <div className="pt-4 border-t border-brand-border space-y-2">
+              <a
+                href="https://www.instagram.com/community.va/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-orange-500/10 border border-pink-200 text-pink-700 flex items-center justify-center gap-2 font-bold"
+              >
+                <Instagram className="w-4 h-4" />
+                <span>Follow on Instagram @community.va</span>
+              </a>
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}

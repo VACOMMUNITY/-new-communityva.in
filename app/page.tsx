@@ -1,3 +1,5 @@
+"use client";
+
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import ScrollProgress from "@/components/motion/ScrollProgress";
 import BrandIntro from "@/components/motion/BrandIntro";

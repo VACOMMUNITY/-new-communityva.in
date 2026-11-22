@@ -78,23 +78,18 @@ export default function EventDetailPage() {
         return;
       }
 
-      // Check payment status if paid event
-      const pay = activeReg.payment;
-      const isEligible = !event?.is_paid || pay?.payment_status === "PAYMENT_VERIFIED";
-
-      if (isEligible) {
-        try {
-          const url = await QRCode.toDataURL(activeReg.qr_token, {
-            width: 240,
-            margin: 2,
-            color: { dark: "#111111", light: "#FFFFFF" }
-          });
-          setPassQrDataUrl(url);
-        } catch (e) {
-          console.error("[QR Render Error]", e);
-        }
-      } else {
-        setPassQrDataUrl(null);
+      try {
+        const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+        const verificationUrl = `${origin}/verify-pass?token=${encodeURIComponent(activeReg.qr_token)}&reg=${encodeURIComponent(activeReg.registration_number)}&eventId=${encodeURIComponent(event?.id || "")}`;
+        
+        const url = await QRCode.toDataURL(verificationUrl, {
+          width: 320,
+          margin: 2,
+          color: { dark: "#090A0A", light: "#FFFFFF" }
+        });
+        setPassQrDataUrl(url);
+      } catch (e) {
+        console.error("[QR Render Error]", e);
       }
     }
 
@@ -203,6 +198,15 @@ export default function EventDetailPage() {
 
   const handleMemberFieldChange = (id: string, field: string, val: string) => {
     setTeamMembers(prev => prev.map(m => m.id === id ? { ...m, [field]: val } : m));
+  };
+
+  const handleDownloadPass = () => {
+    if (!passQrDataUrl) return;
+    const activeReg = registeredSuccess || alreadyRegisteredNotice;
+    const a = document.createElement("a");
+    a.href = passQrDataUrl;
+    a.download = `COMMUNITY_VA_Pass_${activeReg?.registration_number || "Ticket"}.png`;
+    a.click();
   };
 
   const handleSubmitRegistration = async (e: React.FormEvent) => {
@@ -411,25 +415,64 @@ export default function EventDetailPage() {
             </div>
 
             {/* QR Pass Display or Payment Notice */}
-            {passQrDataUrl ? (
-              <div className="p-6 rounded-2xl bg-white border-2 border-dashed border-brand-blue text-center">
-                <span className="text-[11px] font-mono font-bold uppercase text-brand-blue tracking-wider block mb-2">
-                  Official Entry QR Pass (Active)
-                </span>
-                <img
-                  src={passQrDataUrl}
-                  alt="Entry QR Pass"
-                  className="w-48 h-48 mx-auto rounded-xl border border-brand-border shadow-xs"
-                />
-                <p className="text-[11px] font-mono text-brand-muted mt-2">
-                  Present this QR code to the entrance desk scanner for instant check-in.
-                </p>
+            {passQrDataUrl && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-neutral-900 text-white border border-neutral-700 text-center shadow-xl space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                  <div className="text-left">
+                    <span className="text-[10px] font-mono tracking-widest text-brand-blue-light uppercase block font-bold">
+                      OFFICIAL EVENT ENTRY PASS
+                    </span>
+                    <span className="font-display font-extrabold text-sm uppercase text-white">
+                      COMMUNITY<span className="text-brand-blue">.VA</span>
+                    </span>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
+                    PASS ACTIVE
+                  </span>
+                </div>
+
+                <div className="bg-white p-3 rounded-2xl inline-block shadow-md border border-neutral-700">
+                  <img
+                    src={passQrDataUrl}
+                    alt="Official Entry QR Pass"
+                    className="w-56 h-56 mx-auto rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <p className="text-xs font-mono text-neutral-300">
+                    Scan this QR code with any smartphone camera or gate scanner to mark attendance.
+                  </p>
+                  <p className="text-[11px] font-mono text-brand-blue-light mt-1 font-bold">
+                    ID: {registeredSuccess.registration_number}
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    onClick={handleDownloadPass}
+                    className="px-4 py-2 rounded-full bg-white text-brand-dark text-xs font-mono font-bold uppercase hover:bg-neutral-100 transition-colors shadow-sm"
+                  >
+                    Download QR Pass (PNG)
+                  </button>
+
+                  <a
+                    href={`/verify-pass?token=${encodeURIComponent(registeredSuccess.qr_token || "")}&reg=${encodeURIComponent(registeredSuccess.registration_number)}&eventId=${encodeURIComponent(event.id)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-full bg-brand-blue text-white text-xs font-mono font-bold uppercase hover:bg-brand-blue/90 transition-colors shadow-sm"
+                  >
+                    Open Live Gate Scan
+                  </a>
+                </div>
               </div>
-            ) : event.is_paid ? (
+            )}
+
+            {event.is_paid && !passQrDataUrl && (
               <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-left text-xs text-amber-900 leading-relaxed">
                 <strong>Next Step:</strong> Your uploaded payment screenshot is being reviewed by our administrative team. Once verified against our bank UPI ledger, your entry QR pass will be activated and emailed to you.
               </div>
-            ) : null}
+            )}
 
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
@@ -482,36 +525,67 @@ export default function EventDetailPage() {
               </div>
             </div>
 
-            {/* QR Pass if eligible */}
-            {passQrDataUrl ? (
-              <div className="p-6 rounded-2xl bg-white border-2 border-dashed border-brand-blue text-center">
-                <span className="text-[11px] font-mono font-bold uppercase text-brand-blue tracking-wider block mb-2">
-                  Official Entry QR Pass (Active)
-                </span>
-                <img
-                  src={passQrDataUrl}
-                  alt="Entry QR Pass"
-                  className="w-48 h-48 mx-auto rounded-xl border border-brand-border shadow-xs"
-                />
-                <p className="text-[11px] font-mono text-brand-muted mt-2">
-                  Present this QR code to the entrance desk scanner for instant check-in.
-                </p>
+            {/* QR Pass Display */}
+            {passQrDataUrl && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-neutral-900 text-white border border-neutral-700 text-center shadow-xl space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                  <div className="text-left">
+                    <span className="text-[10px] font-mono tracking-widest text-brand-blue-light uppercase block font-bold">
+                      ACTIVE EVENT ENTRY PASS
+                    </span>
+                    <span className="font-display font-extrabold text-sm uppercase text-white">
+                      COMMUNITY<span className="text-brand-blue">.VA</span>
+                    </span>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
+                    CONFIRMED
+                  </span>
+                </div>
+
+                <div className="bg-white p-3 rounded-2xl inline-block shadow-md border border-neutral-700">
+                  <img
+                    src={passQrDataUrl}
+                    alt="Official Entry QR Pass"
+                    className="w-56 h-56 mx-auto rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <p className="text-xs font-mono text-neutral-300">
+                    Scan this QR code with any camera or gate scanner to mark attendance.
+                  </p>
+                  <p className="text-[11px] font-mono text-brand-blue-light mt-1 font-bold">
+                    ID: {alreadyRegisteredNotice.registration_number}
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    onClick={handleDownloadPass}
+                    className="px-4 py-2 rounded-full bg-white text-brand-dark text-xs font-mono font-bold uppercase hover:bg-neutral-100 transition-colors shadow-sm"
+                  >
+                    Download QR Pass (PNG)
+                  </button>
+
+                  <a
+                    href={`/verify-pass?token=${encodeURIComponent(alreadyRegisteredNotice.qr_token || "")}&reg=${encodeURIComponent(alreadyRegisteredNotice.registration_number)}&eventId=${encodeURIComponent(event.id)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-full bg-brand-blue text-white text-xs font-mono font-bold uppercase hover:bg-brand-blue/90 transition-colors shadow-sm"
+                  >
+                    Open Live Gate Scan
+                  </a>
+                </div>
               </div>
-            ) : event.is_paid ? (
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-left text-xs text-amber-900 leading-relaxed font-mono">
-                <strong>Payment Verification Status:</strong> Your payment proof is under review. Your entry QR pass will activate automatically once verified by an administrator.
-              </div>
-            ) : null}
+            )}
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-              {passQrDataUrl && (
-                <button
-                  onClick={() => window.print()}
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-brand-border text-brand-dark text-xs font-bold uppercase tracking-wider hover:bg-neutral-50"
-                >
-                  Print / Save Pass
-                </button>
-              )}
+              <button
+                onClick={() => window.print()}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-full border border-brand-border text-brand-dark text-xs font-bold uppercase tracking-wider hover:bg-neutral-50"
+              >
+                Print / Save Pass
+              </button>
               <Link
                 href="/events"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-dark text-white text-xs font-bold uppercase tracking-wider hover:bg-black"

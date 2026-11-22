@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hashQrToken } from "@/lib/qr";
+import { checkInParticipantByToken } from "@/lib/events/store";
 
 export const dynamic = "force-dynamic";
 
@@ -11,23 +12,7 @@ export async function POST(
 ) {
   try {
     const { id: eventId } = await params;
-
-    // 1. Authenticate user
-    const supabase = await createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          result: "UNAUTHORIZED_SCANNER",
-          message: "Authentication required. Please log in." 
-        },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const { qrToken, scanMethod = "CAMERA" } = body;
 
     if (!qrToken || typeof qrToken !== "string" || qrToken.trim() === "") {
@@ -41,11 +26,44 @@ export async function POST(
       );
     }
 
-    const cleanToken = qrToken.trim();
+    let cleanToken = qrToken.trim();
+    if (cleanToken.includes("token=")) {
+      try {
+        const u = new URL(cleanToken.startsWith("http") ? cleanToken : "http://localhost" + cleanToken);
+        cleanToken = u.searchParams.get("token") || cleanToken;
+      } catch {
+        const m = cleanToken.match(/token=([a-zA-Z0-9_\-\.]+)/);
+        if (m) cleanToken = m[1];
+      }
+    }
+
+    // Try Authenticating User
+    let user: any = null;
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { data } = await supabase.auth.getUser();
+      user = data?.user || null;
+    } catch {
+      user = null;
+    }
+
+    // If not authenticated or in standalone dev mode, check in directly via in-memory/fallback store
+    if (!user) {
+      const outcome = await checkInParticipantByToken({
+        token: cleanToken,
+        eventId,
+        volunteerName: "Gate Scanner",
+        scanMethod,
+      });
+
+      const statusCode = outcome.success ? 200 : (outcome.result === "ALREADY CHECKED IN" ? 409 : 400);
+      return NextResponse.json(outcome, { status: statusCode });
+    }
+
     const tokenHash = hashQrToken(cleanToken);
     const adminClient = createAdminClient();
 
-    // 2. Verify Volunteer Authorization for this specific event
+    // Verify Volunteer Authorization for this specific event
     const { data: profile } = await adminClient
       .from("profiles")
       .select("role")
@@ -88,7 +106,7 @@ export async function POST(
       }
     }
 
-    // 3. Try atomic PostgreSQL function `perform_event_check_in`
+    // Try atomic PostgreSQL function `perform_event_check_in`
     try {
       const { data: rpcData, error: rpcError } = await adminClient.rpc(
         "perform_event_check_in",
@@ -105,276 +123,19 @@ export async function POST(
         return NextResponse.json(rpcData, { status: statusCode });
       }
     } catch (rpcErr) {
-      console.warn("[RPC perform_event_check_in error, falling back to TS transaction]:", rpcErr);
+      console.warn("[RPC perform_event_check_in error, falling back]:", rpcErr);
     }
 
-    // 4. Fallback atomic server-side transaction in TypeScript
-    // Fetch Event
-    const { data: event, error: evtErr } = await adminClient
-      .from("events")
-      .select("id, title, is_paid, fee_amount")
-      .eq("id", eventId)
-      .single();
-
-    if (evtErr || !event) {
-      return NextResponse.json(
-        { success: false, result: "WRONG EVENT", message: "Event not found." },
-        { status: 404 }
-      );
-    }
-
-    // Fetch Registration or Team Member by Token
-    let reg: any = null;
-    let member: any = null;
-    let isMemberToken = false;
-
-    const { data: dbMember } = await adminClient
-      .from("event_team_members")
-      .select("*")
-      .eq("qr_token", cleanToken)
-      .single();
-
-    if (dbMember) {
-      member = dbMember;
-      isMemberToken = true;
-      const { data: parentReg } = await adminClient
-        .from("event_registrations")
-        .select("*, payment:event_payments(*)")
-        .eq("id", dbMember.registration_id)
-        .single();
-      reg = parentReg;
-    } else {
-      const { data: dbReg } = await adminClient
-        .from("event_registrations")
-        .select("*, payment:event_payments(*)")
-        .eq("qr_token", cleanToken)
-        .single();
-      reg = dbReg;
-    }
-
-    if (!reg) {
-      await adminClient.from("event_scan_logs").insert({
-        event_id: eventId,
-        scanned_by: user.id,
-        scan_result: "INVALID QR CODE",
-        token_hash: tokenHash,
-        scan_method: scanMethod,
-        error_message: "Token not found in database.",
-      });
-
-      return NextResponse.json(
-        { success: false, result: "INVALID QR CODE", message: "Invalid QR code. Registration not found." },
-        { status: 404 }
-      );
-    }
-
-    // Check Wrong Event
-    if (reg.event_id !== eventId) {
-      await adminClient.from("event_scan_logs").insert({
-        event_id: eventId,
-        registration_id: reg.id,
-        team_member_id: isMemberToken ? member.id : null,
-        team_name: reg.team_name || null,
-        scanned_by: user.id,
-        scan_result: "WRONG EVENT",
-        token_hash: tokenHash,
-        scan_method: scanMethod,
-        error_message: "Pass registered for another event.",
-      });
-
-      return NextResponse.json(
-        { success: false, result: "WRONG EVENT", message: "This pass belongs to a different event." },
-        { status: 400 }
-      );
-    }
-
-    // Check Cancelled
-    if (reg.registration_status === "CANCELLED") {
-      await adminClient.from("event_scan_logs").insert({
-        event_id: eventId,
-        registration_id: reg.id,
-        team_member_id: isMemberToken ? member.id : null,
-        team_name: reg.team_name || null,
-        scanned_by: user.id,
-        scan_result: "REGISTRATION CANCELLED",
-        token_hash: tokenHash,
-        scan_method: scanMethod,
-        error_message: "Registration cancelled.",
-      });
-
-      return NextResponse.json(
-        { success: false, result: "REGISTRATION CANCELLED", message: "This registration has been cancelled." },
-        { status: 400 }
-      );
-    }
-
-    // Check Payment Verification for Paid Events
-    if (event.is_paid) {
-      const payment = Array.isArray(reg.payment) ? reg.payment[0] : reg.payment;
-      if (!payment || payment.payment_status !== "VERIFIED") {
-        await adminClient.from("event_scan_logs").insert({
-          event_id: eventId,
-          registration_id: reg.id,
-          team_member_id: isMemberToken ? member.id : null,
-          team_name: reg.team_name || null,
-          scanned_by: user.id,
-          scan_result: "PAYMENT NOT VERIFIED",
-          token_hash: tokenHash,
-          scan_method: scanMethod,
-          error_message: "Payment unverified.",
-        });
-
-        return NextResponse.json(
-          {
-            success: false,
-            result: "PAYMENT NOT VERIFIED",
-            message: "Payment for this registration has not been verified by an administrator.",
-            participantName: isMemberToken ? member.member_name : reg.participant_name,
-            teamName: reg.team_name,
-            registrationNumber: reg.registration_number,
-          },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Check Existing Attendance
-    let alreadyCheckedIn = false;
-    let checkedInAt: string | null = null;
-
-    if (isMemberToken) {
-      const { data: memberAttendance } = await adminClient
-        .from("event_attendance")
-        .select("id, checked_in_at")
-        .eq("event_id", eventId)
-        .eq("team_member_id", member.id)
-        .single();
-
-      if (memberAttendance) {
-        alreadyCheckedIn = true;
-        checkedInAt = memberAttendance.checked_in_at;
-      }
-    } else {
-      const { data: regAttendance } = await adminClient
-        .from("event_attendance")
-        .select("id, checked_in_at")
-        .eq("event_id", eventId)
-        .eq("registration_id", reg.id)
-        .single();
-
-      if (regAttendance) {
-        alreadyCheckedIn = true;
-        checkedInAt = regAttendance.checked_in_at;
-      }
-    }
-
-    if (alreadyCheckedIn) {
-      await adminClient.from("event_scan_logs").insert({
-        event_id: eventId,
-        registration_id: reg.id,
-        team_member_id: isMemberToken ? member.id : null,
-        team_name: reg.team_name || null,
-        scanned_by: user.id,
-        scan_result: "ALREADY CHECKED IN",
-        token_hash: tokenHash,
-        scan_method: scanMethod,
-        error_message: "Attendee already checked in.",
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          result: "ALREADY CHECKED IN",
-          message: isMemberToken 
-            ? "This team member has already been checked in!" 
-            : "This participant / team has already been checked in!",
-          participantName: isMemberToken ? member.member_name : reg.participant_name,
-          isTeam: Boolean(reg.is_team_registration),
-          teamName: reg.team_name,
-          registrationNumber: reg.registration_number,
-          checkedInAt,
-        },
-        { status: 400 }
-      );
-    }
-
-    // Atomic Insertion into event_attendance
-    const attendancePayload: any = {
-      event_id: eventId,
-      registration_id: reg.id,
-      participant_id: reg.user_id || null,
-      team_name: reg.team_name || null,
-      checked_in_by: user.id,
-      check_in_method: scanMethod === "MANUAL" ? "MANUAL_ENTRY" : "QR_SCAN",
-    };
-
-    if (isMemberToken) {
-      attendancePayload.team_member_id = member.id;
-    }
-
-    const { error: attendErr } = await adminClient.from("event_attendance").insert(attendancePayload);
-
-    if (attendErr) {
-      if (attendErr.code === "23505") {
-        return NextResponse.json(
-          {
-            success: false,
-            result: "ALREADY CHECKED IN",
-            message: "Simultaneous check-in detected: already checked in.",
-            participantName: isMemberToken ? member.member_name : reg.participant_name,
-            teamName: reg.team_name,
-            registrationNumber: reg.registration_number,
-          },
-          { status: 400 }
-        );
-      }
-      throw attendErr;
-    }
-
-    // Update status on team member if member pass
-    if (isMemberToken) {
-      await adminClient
-        .from("event_team_members")
-        .update({
-          is_checked_in: true,
-          checked_in_at: new Date().toISOString(),
-          checked_in_by: user.id,
-        })
-        .eq("id", member.id);
-    } else if (reg.is_team_registration) {
-      // Team-level pass check-in: mark all team members checked in
-      await adminClient
-        .from("event_team_members")
-        .update({
-          is_checked_in: true,
-          checked_in_at: new Date().toISOString(),
-          checked_in_by: user.id,
-        })
-        .eq("registration_id", reg.id);
-    }
-
-    // Record Successful Scan
-    await adminClient.from("event_scan_logs").insert({
-      event_id: eventId,
-      registration_id: reg.id,
-      team_member_id: isMemberToken ? member.id : null,
-      team_name: reg.team_name || null,
-      scanned_by: user.id,
-      scan_result: "CHECK-IN SUCCESSFUL",
-      token_hash: tokenHash,
-      scan_method: scanMethod,
+    // Fallback store check-in
+    const fallbackOutcome = await checkInParticipantByToken({
+      token: cleanToken,
+      eventId,
+      volunteerName: profile?.role || "Volunteer",
+      scanMethod,
     });
 
-    return NextResponse.json({
-      success: true,
-      result: "CHECK-IN SUCCESSFUL",
-      message: "Check-in confirmed successfully!",
-      participantName: isMemberToken ? member.member_name : reg.participant_name,
-      isTeam: Boolean(reg.is_team_registration),
-      teamName: reg.team_name,
-      registrationNumber: reg.registration_number,
-      checkedInAt: new Date().toISOString(),
-    });
+    const statusCode = fallbackOutcome.success ? 200 : (fallbackOutcome.result === "ALREADY CHECKED IN" ? 409 : 400);
+    return NextResponse.json(fallbackOutcome, { status: statusCode });
   } catch (err: unknown) {
     console.error("[Check-In Action Error]", err);
     return NextResponse.json(

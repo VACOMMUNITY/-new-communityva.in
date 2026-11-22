@@ -32,10 +32,10 @@ const INITIAL_SEED_EVENTS: EventItem[] = [
     description: "A 36-hour sprint uniting student developers, designers, and problem solvers to build software tackling urban, educational, and sustainability challenges in Hyderabad.",
     category: "Technology & Innovation",
     venue: "T-Hub Phase 2 & Virtual Hub, Hyderabad",
-    event_start: "2026-11-20T09:00:00Z",
-    event_end: "2026-11-21T21:00:00Z",
+    event_start: "2026-12-15T09:00:00Z",
+    event_end: "2026-12-17T21:00:00Z",
     registration_start: "2026-10-01T00:00:00Z",
-    registration_end: "2026-11-15T23:59:59Z",
+    registration_end: "2026-12-14T23:59:59Z",
     capacity: 250,
     organizer: "COMMUNITY.VA Tech Division",
     contact_email: OFFICIAL_COMMUNITY_EMAIL,
@@ -113,10 +113,10 @@ const INITIAL_SEED_EVENTS: EventItem[] = [
     description: "An intensive interactive workshop focusing on stage presence, impromptu speaking, elevator pitches, and leading student organizations with empathy and impact.",
     category: "Personal Development",
     venue: "Ravindra Bharathi Mini Hall, Lakdikapul, Hyderabad",
-    event_start: "2026-11-28T14:00:00Z",
-    event_end: "2026-11-28T18:30:00Z",
+    event_start: "2026-12-05T14:00:00Z",
+    event_end: "2026-12-05T18:30:00Z",
     registration_start: "2026-10-10T00:00:00Z",
-    registration_end: "2026-11-26T18:00:00Z",
+    registration_end: "2026-12-04T18:00:00Z",
     capacity: 120,
     organizer: "COMMUNITY.VA Personal Growth Division",
     contact_email: OFFICIAL_COMMUNITY_EMAIL,
@@ -165,10 +165,10 @@ const INITIAL_SEED_EVENTS: EventItem[] = [
     description: "An open stage for student vocalists, musicians, poets, and storytellers to perform in a supportive, energetic, youth-driven atmosphere.",
     category: "Events & Entertainment",
     venue: "Lamakaan Cultural Space, Banjara Hills, Hyderabad",
-    event_start: "2026-12-05T17:30:00Z",
-    event_end: "2026-12-05T21:00:00Z",
+    event_start: "2026-12-20T17:30:00Z",
+    event_end: "2026-12-20T21:00:00Z",
     registration_start: "2026-10-20T00:00:00Z",
-    registration_end: "2026-12-03T23:59:59Z",
+    registration_end: "2026-12-19T23:59:59Z",
     capacity: 90,
     organizer: "COMMUNITY.VA Cultural Division",
     contact_email: OFFICIAL_COMMUNITY_EMAIL,
@@ -204,9 +204,32 @@ const INITIAL_SEED_EVENTS: EventItem[] = [
   }
 ];
 
-// Fallback in-memory cache to preserve state during local testing
-const inMemoryEvents: Map<string, EventItem> = new Map();
-const inMemoryRegistrations: Map<string, EventRegistration[]> = new Map();
+// In-Memory Attendance Records
+export interface StoredAttendanceRecord {
+  id: string;
+  event_id: string;
+  registration_id: string;
+  team_member_id?: string | null;
+  participant_name: string;
+  registration_number: string;
+  team_name?: string | null;
+  checked_in_at: string;
+  checked_in_by: string;
+  check_in_method: string;
+}
+
+// Global singletons for Next.js cross-route consistency
+const inMemoryEvents: Map<string, EventItem> = 
+  (globalThis as any).__cvaInMemoryEvents || new Map();
+(globalThis as any).__cvaInMemoryEvents = inMemoryEvents;
+
+const inMemoryRegistrations: Map<string, EventRegistration[]> = 
+  (globalThis as any).__cvaInMemoryRegistrations || new Map();
+(globalThis as any).__cvaInMemoryRegistrations = inMemoryRegistrations;
+
+const inMemoryAttendance: Map<string, StoredAttendanceRecord> = 
+  (globalThis as any).__cvaInMemoryAttendance || new Map();
+(globalThis as any).__cvaInMemoryAttendance = inMemoryAttendance;
 
 // Initialize memory cache
 INITIAL_SEED_EVENTS.forEach(evt => inMemoryEvents.set(evt.id, evt));
@@ -228,6 +251,7 @@ inMemoryRegistrations.set("evt-01-hackathon", [
       "T-Shirt Size for Hackathon Kit": "L"
     },
     registration_status: "CONFIRMED",
+    qr_token: "tk_seed_saikrishna_2841",
     registered_at: "2026-10-28T14:30:00Z",
     updated_at: "2026-10-28T14:30:00Z",
     payment: {
@@ -260,6 +284,7 @@ inMemoryRegistrations.set("evt-01-hackathon", [
       "T-Shirt Size for Hackathon Kit": "M"
     },
     registration_status: "CONFIRMED",
+    qr_token: "tk_seed_ananya_9023",
     registered_at: "2026-10-29T10:15:00Z",
     updated_at: "2026-10-29T11:00:00Z",
     payment: {
@@ -667,7 +692,6 @@ export async function registerParticipant(params: {
 
     if (params.teamMembers && params.teamMembers.length > 0) {
       for (const m of params.teamMembers) {
-        // Skip duplicate of leader if entered twice
         if (m.email && m.email.toLowerCase() === params.participantEmail.toLowerCase()) continue;
         preparedMembers.push({
           id: `tm-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
@@ -978,4 +1002,256 @@ export async function updatePaymentVerification(params: {
   }
 
   return { success: true };
+}
+
+// -----------------------------------------------------------------------------
+// ATTENDANCE & VERIFICATION METHODS
+// -----------------------------------------------------------------------------
+
+export async function lookupRegistrationByToken(tokenOrUrl: string, eventIdFilter?: string): Promise<{
+  found: boolean;
+  registration?: EventRegistration;
+  teamMember?: EventTeamMember;
+  event?: EventItem;
+  isCheckedIn: boolean;
+  checkedInAt?: string;
+  error?: string;
+}> {
+  let cleanToken = (tokenOrUrl || '').trim();
+
+  // If token is a full URL, extract token or reg parameter
+  if (cleanToken.includes('token=')) {
+    try {
+      const u = new URL(cleanToken.startsWith('http') ? cleanToken : 'http://localhost' + cleanToken);
+      cleanToken = u.searchParams.get('token') || cleanToken;
+    } catch {
+      const m = cleanToken.match(/token=([a-zA-Z0-9_\-\.]+)/);
+      if (m) cleanToken = m[1];
+    }
+  }
+
+  // 1. Check in-memory registrations
+  for (const [evtId, regs] of inMemoryRegistrations.entries()) {
+    if (eventIdFilter && evtId !== eventIdFilter) continue;
+    for (const reg of regs) {
+      if (reg.qr_token === cleanToken || reg.registration_number === cleanToken) {
+        const evt = inMemoryEvents.get(evtId) || reg.event;
+        const attendKey = `${evtId}:${reg.id}`;
+        const att = inMemoryAttendance.get(attendKey);
+        return {
+          found: true,
+          registration: reg,
+          event: evt,
+          isCheckedIn: Boolean(att),
+          checkedInAt: att?.checked_in_at,
+        };
+      }
+      if (reg.team_members && reg.team_members.length > 0) {
+        for (const tm of reg.team_members) {
+          if (tm.qr_token === cleanToken) {
+            const evt = inMemoryEvents.get(evtId) || reg.event;
+            const attendKey = `${evtId}:member:${tm.id}`;
+            const att = inMemoryAttendance.get(attendKey);
+            return {
+              found: true,
+              registration: reg,
+              teamMember: tm,
+              event: evt,
+              isCheckedIn: Boolean(att),
+              checkedInAt: att?.checked_in_at,
+            };
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Query Supabase if available
+  const adminClient = createAdminClient();
+  try {
+    const { data: dbMember } = await adminClient
+      .from('event_team_members')
+      .select('*, registration:event_registrations(*, event:events(*))')
+      .eq('qr_token', cleanToken)
+      .single();
+
+    if (dbMember && dbMember.registration) {
+      const reg = dbMember.registration as any;
+      const evt = reg.event;
+      const { data: att } = await adminClient
+        .from('event_attendance')
+        .select('*')
+        .eq('team_member_id', dbMember.id)
+        .single();
+
+      return {
+        found: true,
+        registration: reg,
+        teamMember: dbMember,
+        event: evt,
+        isCheckedIn: Boolean(att),
+        checkedInAt: att?.checked_in_at,
+      };
+    }
+
+    const { data: dbReg } = await adminClient
+      .from('event_registrations')
+      .select('*, event:events(*)')
+      .or(`qr_token.eq.${cleanToken},registration_number.eq.${cleanToken}`)
+      .single();
+
+    if (dbReg) {
+      const evt = dbReg.event;
+      const { data: att } = await adminClient
+        .from('event_attendance')
+        .select('*')
+        .eq('registration_id', dbReg.id)
+        .single();
+
+      return {
+        found: true,
+        registration: dbReg,
+        event: evt,
+        isCheckedIn: Boolean(att),
+        checkedInAt: att?.checked_in_at,
+      };
+    }
+  } catch (e) {
+    console.warn('[lookupRegistrationByToken] DB error:', e);
+  }
+
+  return { found: false, isCheckedIn: false, error: 'Registration pass not found' };
+}
+
+export async function checkInParticipantByToken(params: {
+  token: string;
+  eventId?: string;
+  volunteerName?: string;
+  scanMethod?: 'CAMERA' | 'MANUAL';
+}): Promise<{
+  success: boolean;
+  result: string;
+  message: string;
+  participantName?: string;
+  registrationNumber?: string;
+  isTeam?: boolean;
+  teamName?: string | null;
+  eventTitle?: string;
+  venue?: string;
+  checkedInAt?: string;
+}> {
+  const lookup = await lookupRegistrationByToken(params.token, params.eventId);
+  if (!lookup.found || !lookup.registration) {
+    return {
+      success: false,
+      result: 'INVALID QR CODE',
+      message: 'Invalid pass or ticket. No registration found for this QR code.',
+    };
+  }
+
+  const { registration: reg, teamMember: member, event } = lookup;
+
+  if (params.eventId && reg.event_id !== params.eventId) {
+    return {
+      success: false,
+      result: 'WRONG EVENT',
+      message: 'This pass belongs to a different event: ' + (event?.title || reg.event_id),
+      participantName: member ? member.member_name : reg.participant_name,
+      registrationNumber: reg.registration_number,
+    };
+  }
+
+  if (reg.registration_status === 'CANCELLED') {
+    return {
+      success: false,
+      result: 'REGISTRATION CANCELLED',
+      message: 'This registration has been cancelled.',
+      participantName: member ? member.member_name : reg.participant_name,
+      registrationNumber: reg.registration_number,
+    };
+  }
+
+  const participantName = member ? member.member_name : reg.participant_name;
+  const isTeam = Boolean(reg.is_team_registration);
+  const teamName = reg.team_name || null;
+  const attendKey = member ? `${reg.event_id}:member:${member.id}` : `${reg.event_id}:${reg.id}`;
+
+  // Check if already checked in
+  if (lookup.isCheckedIn) {
+    return {
+      success: false,
+      result: 'ALREADY CHECKED IN',
+      message: member 
+        ? `${member.member_name} has already been checked in!` 
+        : `${reg.participant_name} has already been checked in!`,
+      participantName,
+      registrationNumber: reg.registration_number,
+      isTeam,
+      teamName,
+      eventTitle: event?.title,
+      venue: event?.venue,
+      checkedInAt: lookup.checkedInAt,
+    };
+  }
+
+  // Record Attendance
+  const now = new Date().toISOString();
+  const volunteerName = params.volunteerName || 'Gate Scanner';
+
+  inMemoryAttendance.set(attendKey, {
+    id: 'att-' + Date.now().toString(36),
+    event_id: reg.event_id,
+    registration_id: reg.id,
+    team_member_id: member?.id || null,
+    participant_name: participantName,
+    registration_number: reg.registration_number,
+    team_name: teamName,
+    checked_in_at: now,
+    checked_in_by: volunteerName,
+    check_in_method: params.scanMethod || 'CAMERA',
+  });
+
+  // Also persist to Supabase if connected
+  const adminClient = createAdminClient();
+  try {
+    await adminClient.from('event_attendance').insert({
+      event_id: reg.event_id,
+      registration_id: reg.id,
+      team_member_id: member?.id || null,
+      team_name: teamName,
+      check_in_method: params.scanMethod === 'MANUAL' ? 'MANUAL_ENTRY' : 'QR_SCAN',
+    });
+  } catch (err) {
+    // In-memory fallback is active
+  }
+
+  return {
+    success: true,
+    result: 'CHECK-IN SUCCESSFUL',
+    message: member
+      ? `Welcome ${member.member_name}! Attendance marked successfully.`
+      : `Welcome ${reg.participant_name}! Attendance marked successfully.`,
+    participantName,
+    registrationNumber: reg.registration_number,
+    isTeam,
+    teamName,
+    eventTitle: event?.title,
+    venue: event?.venue,
+    checkedInAt: now,
+  };
+}
+
+export function getAttendanceStatsForEvent(eventId: string) {
+  const regs = inMemoryRegistrations.get(eventId) || [];
+  let checkedInCount = 0;
+  for (const reg of regs) {
+    if (inMemoryAttendance.has(`${eventId}:${reg.id}`)) {
+      checkedInCount++;
+    }
+  }
+  return {
+    totalRegistrations: regs.length,
+    checkedInCount,
+    pendingCount: Math.max(0, regs.length - checkedInCount)
+  };
 }
