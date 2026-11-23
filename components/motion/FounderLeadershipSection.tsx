@@ -11,8 +11,6 @@ import {
   Sparkles, 
   Award,
   ShieldCheck,
-  Instagram,
-  Youtube
 } from "lucide-react";
 
 const LEADERSHIP_RESPONSIBILITIES = [
@@ -27,11 +25,7 @@ const LEADERSHIP_RESPONSIBILITIES = [
 
 export default function FounderLeadershipSection() {
   return (
-    <section id="leadership" className="relative py-16 sm:py-24 bg-white border-b border-brand-border overflow-hidden">
-      {/* Background Subtle Accent */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50/50 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-rose-50/50 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
-
+    <section id="leadership" className="relative py-16 sm:py-24 bg-white border-b border-brand-border">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Mobile Section Header Tag */}
@@ -53,16 +47,33 @@ export default function FounderLeadershipSection() {
           <div className="lg:col-span-5 space-y-3.5">
             
             {/* Founder Card with Image */}
-            <div className="relative rounded-3xl overflow-hidden border border-neutral-200 shadow-md bg-neutral-900">
+            <div className="relative rounded-3xl overflow-hidden border border-neutral-200 shadow-md bg-neutral-100">
               <div className="relative aspect-[4/4.7] w-full">
                 <Image
                   src="/team/paidimarri-abhiram.jpg"
                   alt="Paidimarri Abhiram - Founder & CEO of COMMUNITY.VA"
                   fill
                   priority
-                  className="object-cover object-top"
+                  unoptimized
+                  className="object-cover object-center"
                   sizes="(max-width: 768px) 100vw, 450px"
                 />
+
+                {/* Crisp Top Badge Overlay */}
+                <div className="absolute top-3.5 left-3.5 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shadow-md">
+                  <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                  <span>Founder &amp; CEO</span>
+                </div>
+
+                {/* Crisp Bottom Name Card Overlay */}
+                <div className="absolute bottom-3.5 inset-x-3.5 z-10 p-3.5 rounded-2xl bg-neutral-900/95 text-white border border-neutral-700/60 shadow-lg">
+                  <div className="font-extrabold text-sm text-white tracking-tight">
+                    Paidimarri Abhiram
+                  </div>
+                  <div className="text-[11px] font-mono text-neutral-400 mt-0.5">
+                    Founder &amp; CEO • COMMUNITY.VA
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -165,7 +176,7 @@ export default function FounderLeadershipSection() {
                 {LEADERSHIP_RESPONSIBILITIES.map((resp, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-200/80 hover:bg-white hover:border-blue-300 transition-colors shadow-2xs"
+                    className="flex items-center gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-200 hover:bg-white hover:border-blue-300 transition-colors shadow-2xs"
                   >
                     <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
                     <span className="text-xs font-medium text-neutral-800 leading-snug">
@@ -176,11 +187,11 @@ export default function FounderLeadershipSection() {
               </div>
             </div>
 
-            {/* Founder's Mission Callout Box */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50 via-sky-50 to-indigo-50 border border-blue-200/80 flex items-start gap-3 shadow-xs">
+            {/* Founder's Mission Callout Box (Clean & Sharp) */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-blue-50/70 border border-blue-200 flex items-start gap-3 shadow-xs">
               <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-              <div className="text-xs sm:text-sm text-neutral-700 leading-relaxed">
-                <span className="font-bold text-neutral-900">Founder&apos;s Mission:</span> Dedicated to empowering student talent across Telangana through accessible hackathons, certified workshops, and career pathways.
+              <div className="text-xs sm:text-sm text-neutral-800 leading-relaxed">
+                <span className="font-bold text-neutral-950">Founder&apos;s Mission:</span> Dedicated to empowering student talent across Telangana through accessible hackathons, certified workshops, and career pathways.
               </div>
             </div>
 
