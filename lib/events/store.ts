@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { 
   EventItem, 
   EventFormQuestion, 
@@ -372,6 +372,15 @@ export async function getEvents(options: {
 }
 
 export async function getEventBySlugOrId(slugOrId: string): Promise<EventItem | null> {
+  if (!isSupabaseConfigured()) {
+    for (const evt of inMemoryEvents.values()) {
+      if (evt.id === slugOrId || evt.slug === slugOrId) {
+        return evt;
+      }
+    }
+    return null;
+  }
+
   const adminClient = createAdminClient();
 
   try {
@@ -849,6 +858,10 @@ export async function registerParticipant(params: {
 }
 
 export async function getEventRegistrations(eventId: string): Promise<EventRegistration[]> {
+  if (!isSupabaseConfigured()) {
+    return inMemoryRegistrations.get(eventId) || [];
+  }
+
   const adminClient = createAdminClient();
 
   try {

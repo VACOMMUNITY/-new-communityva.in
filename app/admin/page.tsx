@@ -18,7 +18,9 @@ import {
   TrendingUp,
   RefreshCw,
   Calendar,
-  CreditCard
+  CreditCard,
+  FileSpreadsheet,
+  Download
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -149,6 +151,13 @@ export default function AdminOverviewPage() {
             Overview
           </Link>
           <Link
+            href="/admin/registrations"
+            className="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 shadow-xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Excel Export & Registry</span>
+          </Link>
+          <Link
             href="/admin/events"
             className="px-3.5 py-1.5 rounded-full hover:bg-brand-bg text-brand-dark/80 text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-1.5"
           >
@@ -185,6 +194,39 @@ export default function AdminOverviewPage() {
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex-1">
         
+        {/* Real-time Registrations & Excel Export Banner */}
+        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-emerald-950 via-neutral-900 to-brand-dark text-white border border-emerald-500/30 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider mb-1">
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Real-Time Registry & Excel Suite</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
+              Export All Registrations to Excel (.xlsx)
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-300 mt-1 max-w-xl">
+              Every participant, student, volunteer, college, and corporate partner registration on the website is instantly saved, updated, and ready for one-click Excel download.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/admin/registrations"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white text-neutral-950 font-bold text-xs hover:bg-neutral-100 transition-colors shadow-sm"
+            >
+              <span>View All Registrations</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <a
+              href="/api/admin/export/excel?type=all"
+              download
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs hover:bg-emerald-500 transition-colors shadow-sm"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download Master Excel (.xlsx)</span>
+            </a>
+          </div>
+        </div>
+
         <div className="mb-8">
           <span className="text-xs font-mono font-bold tracking-widest text-brand-blue uppercase">
             Community Management Suite
