@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUp, Mail, MapPin, Instagram, Youtube } from "lucide-react";
+import { ArrowUp, Mail, MapPin, Instagram, Youtube, Award } from "lucide-react";
 import { OFFICIAL_COMMUNITY_EMAIL, OFFICIAL_MAILTO_LINK } from "@/lib/constants";
 
 export default function Footer() {
@@ -33,7 +33,7 @@ export default function Footer() {
             </p>
 
             <p className="font-body text-xs sm:text-sm text-white/70 max-w-sm leading-relaxed">
-              Bringing people together, discovering potential and creating opportunities. A student-led youth community fostering innovation, personal leadership, culture, and sports across Hyderabad.
+              Bringing people together, discovering potential and creating opportunities. A youth-driven organization founded by Paidimarri Abhiram to empower students through events, sports, innovation, networking, and skill development.
             </p>
 
             <div className="flex items-center gap-2 pt-2 text-xs font-mono text-white/60">
@@ -49,107 +49,95 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 font-body text-xs sm:text-sm text-white/80">
               {[
-                { name: "Home", href: "#home" },
-                { name: "About Us", href: "#about" },
-                { name: "Activity Areas", href: "#activities" },
-                { name: "Events & Calendar", href: "#events" },
-                { name: "Our Community", href: "#community" },
-                { name: "Get Involved", href: "#get-involved" },
-                { name: "Contact Portal", href: "#contact" },
+                { name: "Home", href: "/#home" },
+                { name: "Leadership (Founder & CEO)", href: "/#leadership" },
+                { name: "Activity Areas", href: "/#activities" },
+                { name: "Events & Pass Verification", href: "/events" },
+                { name: "Institutional Deck", href: "/institutional-deck" },
+                { name: "Admin Registrations Hub", href: "/admin/registrations" },
+                { name: "Contact Portal", href: "/#contact" },
               ].map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="hover:text-brand-blue-light transition-colors flex items-center gap-1.5"
+                    className="hover:text-white transition-colors"
                   >
-                    <span className="text-[10px] text-white/40 font-mono">→</span>
-                    <span>{item.name}</span>
+                    {item.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Activity Focus Areas Column */}
+          {/* Contact & Official Channels Column */}
           <div className="md:col-span-4 space-y-4">
             <h4 className="font-mono text-xs uppercase tracking-widest text-white/50 font-bold">
-              Five Core Spheres
+              Leadership & Channels
             </h4>
-            <ul className="space-y-2 font-mono text-xs text-white/70">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
-                <span>01 Technology & Innovation</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-red" />
-                <span>02 Personal Development</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
-                <span>03 Events & Entertainment</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-red" />
-                <span>04 Sports & Activities</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
-                <span>05 Career & Opportunities</span>
-              </li>
-            </ul>
+            <div className="space-y-3 font-body text-xs text-white/70">
+              <div>
+                <span className="font-mono text-[10px] text-white/40 uppercase block">Founder & CEO</span>
+                <span className="font-bold text-white text-xs">Paidimarri Abhiram</span>
+              </div>
 
-                        <div className="pt-4 border-t border-white/10 space-y-2">
-              <span className="block font-mono text-[11px] text-white/50 uppercase mb-1">
-                Connect on Social & Email:
-              </span>
-              <a
-                href="https://www.instagram.com/community.va/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1.5 transition-colors"
-              >
-                <Instagram className="w-3.5 h-3.5 text-pink-400" />
-                <span>@community.va (Instagram)</span>
-              </a>
-              <a
-                href="https://www.youtube.com/@CommunityVA"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-xs text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors"
-              >
-                <Youtube className="w-3.5 h-3.5 text-red-400" />
-                <span>@CommunityVA (YouTube)</span>
-              </a>
-              <a
-                href={OFFICIAL_MAILTO_LINK}
-                className="font-mono text-xs text-brand-blue-light hover:underline flex items-center gap-1.5"
-              >
-                <Mail className="w-3.5 h-3.5" />
-                <span>{OFFICIAL_COMMUNITY_EMAIL}</span>
-              </a>
+              <div>
+                <span className="font-mono text-[10px] text-white/40 uppercase block">Founder Direct Email</span>
+                <a
+                  href="mailto:community.va01@gmail.com"
+                  className="font-mono text-xs text-brand-blue-light hover:underline"
+                >
+                  community.va01@gmail.com
+                </a>
+              </div>
+
+              <div>
+                <span className="font-mono text-[10px] text-white/40 uppercase block">Official Organization Email</span>
+                <a
+                  href={OFFICIAL_MAILTO_LINK}
+                  className="font-mono text-xs text-brand-blue-light hover:underline"
+                >
+                  {OFFICIAL_COMMUNITY_EMAIL}
+                </a>
+              </div>
+
+              <div className="pt-2 flex flex-col gap-2">
+                <a
+                  href="https://www.instagram.com/community.va/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-pink-400 hover:text-pink-300 flex items-center gap-1.5 transition-colors"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-pink-400" />
+                  <span>@community.va (Instagram)</span>
+                </a>
+                <a
+                  href="https://www.youtube.com/@CommunityVA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors"
+                >
+                  <Youtube className="w-3.5 h-3.5 text-red-400" />
+                  <span>@CommunityVA (YouTube)</span>
+                </a>
+              </div>
             </div>
           </div>
 
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/50">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-white/50">
           <div>
-            © 2026 COMMUNITY.VA. All rights reserved.
+            &copy; {new Date().getFullYear()} COMMUNITY.VA. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-6">
-            <span>Student-Led • Hyderabad</span>
-            <button
-              type="button"
-              onClick={scrollToTop}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label="Back to top"
-            >
-              <span>Back to Top</span>
-              <ArrowUp className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          <button
+            onClick={scrollToTop}
+            className="flex items-center gap-1.5 hover:text-white transition-colors"
+          >
+            <span>Back to top</span>
+            <ArrowUp className="w-3.5 h-3.5" />
+          </button>
         </div>
 
       </div>

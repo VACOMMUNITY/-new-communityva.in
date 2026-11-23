@@ -6,6 +6,7 @@ import BrandIntro from "@/components/motion/BrandIntro";
 import CinematicNavbar from "@/components/motion/CinematicNavbar";
 import HeroScene from "@/components/motion/HeroScene";
 import CommunityScene from "@/components/motion/CommunityScene";
+import FounderLeadershipSection from "@/components/motion/FounderLeadershipSection";
 import ActivityScene from "@/components/motion/ActivityScene";
 import TransformationScene from "@/components/motion/TransformationScene";
 import EcosystemScene from "@/components/motion/EcosystemScene";
@@ -31,25 +32,28 @@ export default function Home() {
           {/* Scene 01: Pinned Immersive Hero */}
           <HeroScene />
 
-          {/* Scene 02: Pinned Developing Geometric Network */}
+          {/* Scene 02: Founder & CEO Leadership Profile */}
+          <FounderLeadershipSection />
+
+          {/* Scene 03: Pinned Developing Geometric Network */}
           <CommunityScene />
 
-          {/* Scene 03: Pinned Full-Screen Five Activity Spheres */}
+          {/* Scene 04: Pinned Full-Screen Five Activity Spheres */}
           <ActivityScene />
 
-          {/* Scene 04: Pinned Horizontal Scrubbed Progression (LEARN -> CREATE -> EXPERIENCE) */}
+          {/* Scene 05: Pinned Horizontal Scrubbed Progression (LEARN -> CREATE -> EXPERIENCE) */}
           <TransformationScene />
 
-          {/* Scene 05: Pinned Connected Community Ecosystem Diagram */}
+          {/* Scene 06: Pinned Connected Community Ecosystem Diagram */}
           <EcosystemScene />
 
-          {/* Scene 06: Cinematic Event Showcase */}
+          {/* Scene 07: Cinematic Event Showcase */}
           <EventScene />
 
-          {/* Scene 07: Four Registration Pathways */}
+          {/* Scene 08: Four Registration Pathways */}
           <JoinScene />
 
-          {/* Scene 08: Final Brand Statement, Contact Form & Minimal Footer */}
+          {/* Scene 09: Final Brand Statement, Contact Form & Minimal Footer */}
           <FinalScene />
         </main>
 

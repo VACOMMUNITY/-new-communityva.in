@@ -180,6 +180,10 @@ export default function InstitutionalDeckPage() {
                   <span>{OFFICIAL_COMMUNITY_EMAIL}</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-sky-600 shrink-0" />
+                  <span>community.va01@gmail.com (Founder Desk)</span>
+                </div>
+                <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>+91 98490 46019</span>
                 </div>
@@ -216,8 +220,9 @@ export default function InstitutionalDeckPage() {
             <div className="pt-6 flex items-end justify-between border-t border-neutral-200">
               <div>
                 <p className="font-mono text-xs uppercase font-bold text-neutral-700">Issued On Behalf Of</p>
-                <p className="font-display font-extrabold text-sm uppercase text-brand-dark mt-0.5">COMMUNITY.VA Executive Board</p>
-                <p className="font-mono text-[11px] text-neutral-500">Connecting People • Creating Opportunities</p>
+                <p className="font-display font-extrabold text-sm uppercase text-brand-dark mt-0.5">Paidimarri Abhiram</p>
+                <p className="font-mono text-[11px] text-neutral-600 font-bold">Founder &amp; CEO • COMMUNITY.VA</p>
+                <p className="font-mono text-[10px] text-neutral-500">Connecting People • Creating Opportunities</p>
               </div>
               <div className="text-right">
                 <div className="inline-block px-3 py-1 rounded-full border border-emerald-500/50 bg-emerald-50 text-emerald-800 font-mono text-[11px] font-bold uppercase">
