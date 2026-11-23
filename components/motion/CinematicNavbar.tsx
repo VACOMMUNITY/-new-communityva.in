@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X, ArrowUpRight, LogIn, Instagram } from "lucide-react";
+import { Menu, X, ArrowUpRight, LogIn, Instagram, Youtube } from "lucide-react";
 
 const NAV_SCENES = [
   { label: "01 — COMMUNITY", href: "/#community-story" },
@@ -147,6 +147,15 @@ export default function CinematicNavbar() {
               >
                 <Instagram className="w-4 h-4" />
                 <span>Follow on Instagram @community.va</span>
+              </a>
+              <a
+                href="https://www.youtube.com/@CommunityVA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-3 rounded-xl bg-red-500/10 border border-red-200 text-red-700 flex items-center justify-center gap-2 font-bold"
+              >
+                <Youtube className="w-4 h-4 text-red-600" />
+                <span>Subscribe on YouTube @CommunityVA</span>
               </a>
               <Link
                 href="/login"

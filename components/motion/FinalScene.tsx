@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUp, ArrowUpRight, Mail, MapPin, Send, Loader2, CheckCircle2, AlertCircle, Instagram, Download } from "lucide-react";
+import { ArrowUp, ArrowUpRight, Mail, MapPin, Send, Loader2, CheckCircle2, AlertCircle, Instagram, Download, Youtube } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { OFFICIAL_COMMUNITY_EMAIL, OFFICIAL_MAILTO_LINK } from "@/lib/constants";
@@ -169,6 +169,17 @@ export default function FinalScene() {
                 </a>
               </div>
               <div className="flex items-center gap-2">
+                <Youtube className="w-4 h-4 text-red-400" />
+                <a 
+                  href="https://www.youtube.com/@CommunityVA" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-red-400 transition-colors"
+                >
+                  YouTube @CommunityVA
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-brand-blue" />
                 <a href={OFFICIAL_MAILTO_LINK} className="hover:text-brand-blue-light transition-colors">
                   {OFFICIAL_COMMUNITY_EMAIL}
@@ -311,6 +322,15 @@ export default function FinalScene() {
             >
               <Instagram className="w-3.5 h-3.5" />
               <span>Instagram</span>
+            </a>
+            <a 
+              href="https://www.youtube.com/@CommunityVA" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center gap-1.5 text-red-400 hover:text-red-300 transition-colors font-bold"
+            >
+              <Youtube className="w-3.5 h-3.5" />
+              <span>YouTube</span>
             </a>
             <Link href="/login" className="hover:text-white transition-colors">
               Portal Login

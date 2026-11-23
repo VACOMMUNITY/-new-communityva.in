@@ -10,3 +10,5 @@ export const OFFICIAL_COMMUNITY_NAME = "COMMUNITY.VA Official";
 export const OFFICIAL_COMMUNITY_CITY = "Hyderabad, Telangana, India";
 export const OFFICIAL_COMMUNITY_INSTAGRAM = "https://www.instagram.com/community.va/";
 export const OFFICIAL_MAILTO_LINK = `mailto:${OFFICIAL_COMMUNITY_EMAIL}`;
+
+export const OFFICIAL_COMMUNITY_YOUTUBE = "https://www.youtube.com/@CommunityVA";

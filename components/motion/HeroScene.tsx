@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, MapPin, Instagram, Download } from "lucide-react";
+import { ArrowDown, ArrowUpRight, MapPin, Instagram, Download, Youtube } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -103,6 +103,15 @@ export default function HeroScene() {
               <Instagram className="w-3.5 h-3.5 text-pink-600" />
               <span>@community.va</span>
             </a>
+            <a
+              href="https://www.youtube.com/@CommunityVA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 border border-red-200 text-xs font-mono font-bold text-red-700 hover:bg-red-100 transition-colors shadow-xs"
+            >
+              <Youtube className="w-3.5 h-3.5 text-red-600" />
+              <span>@CommunityVA</span>
+            </a>
           </div>
 
           <div className="hidden md:flex items-center gap-4 text-xs font-mono text-brand-grey uppercase tracking-widest">
@@ -160,6 +169,16 @@ export default function HeroScene() {
             >
               <Instagram className="w-4 h-4 text-white" />
               <span>Instagram @community.va</span>
+              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </a>
+            <a
+              href="https://www.youtube.com/@CommunityVA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white rounded-full font-display text-xs sm:text-sm font-bold uppercase tracking-wider hover:opacity-90 transition-all shadow-md group"
+            >
+              <Youtube className="w-4 h-4 text-white" />
+              <span>YouTube @CommunityVA</span>
               <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </a>
 

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUp, Mail, MapPin, Instagram } from "lucide-react";
+import { ArrowUp, Mail, MapPin, Instagram, Youtube } from "lucide-react";
 import { OFFICIAL_COMMUNITY_EMAIL, OFFICIAL_MAILTO_LINK } from "@/lib/constants";
 
 export default function Footer() {
@@ -110,6 +110,15 @@ export default function Footer() {
               >
                 <Instagram className="w-3.5 h-3.5 text-pink-400" />
                 <span>@community.va (Instagram)</span>
+              </a>
+              <a
+                href="https://www.youtube.com/@CommunityVA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-red-400 hover:text-red-300 flex items-center gap-1.5 transition-colors"
+              >
+                <Youtube className="w-3.5 h-3.5 text-red-400" />
+                <span>@CommunityVA (YouTube)</span>
               </a>
               <a
                 href={OFFICIAL_MAILTO_LINK}

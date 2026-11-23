@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Download, Printer, ArrowLeft, Building2, CheckCircle2, Mail, Phone, MapPin, Instagram, Globe } from "lucide-react";
+import { Download, Printer, ArrowLeft, Building2, CheckCircle2, Mail, Phone, MapPin, Instagram, Globe, Youtube } from "lucide-react";
 import { OFFICIAL_COMMUNITY_EMAIL } from "@/lib/constants";
 
 export default function InstitutionalDeckPage() {
@@ -192,6 +192,17 @@ export default function InstitutionalDeckPage() {
                     className="hover:text-pink-600 underline"
                   >
                     @community.va
+                  </a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Youtube className="w-4 h-4 text-red-600 shrink-0" />
+                  <a 
+                    href="https://www.youtube.com/@CommunityVA" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-red-600 underline"
+                  >
+                    @CommunityVA
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
