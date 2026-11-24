@@ -1,12 +1,24 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 const SESSION_COOKIE_NAME = "cva_admin_session";
 const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || "cva_super_secure_admin_jwt_key_2026_99x7";
 
-// Single authorized member email for admin access
-export const ALLOWED_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "community.vaofficial@gmail.com").toLowerCase().trim();
+// Designated administrator email accounts
+export const AUTHORIZED_ADMIN_EMAILS = [
+  "paidimarriabhiram@gmail.com",
+  "community.vaofficial@gmail.com",
+  (process.env.ADMIN_EMAIL || "").toLowerCase().trim(),
+].filter(Boolean);
+
+export const ALLOWED_ADMIN_EMAIL = "paidimarriabhiram@gmail.com";
+
+export function isAuthorizedAdminEmail(email: string | undefined | null): boolean {
+  if (!email) return false;
+  const normalized = email.toLowerCase().trim();
+  return AUTHORIZED_ADMIN_EMAILS.includes(normalized);
+}
 
 interface AdminTokenPayload {
   email: string;
@@ -15,7 +27,7 @@ interface AdminTokenPayload {
 }
 
 /**
- * Creates an HMAC-SHA256 signed session token for the single admin member
+ * Creates an HMAC-SHA256 signed session token for the admin member
  */
 export function signAdminToken(email: string): string {
   const payload: AdminTokenPayload = {
@@ -58,8 +70,8 @@ export function verifyAdminToken(token: string | undefined | null): { valid: boo
     if (Date.now() > payload.exp) return { valid: false };
     if (payload.role !== "ADMIN") return { valid: false };
 
-    // Enforce single-member admin authorization
-    if (payload.email !== ALLOWED_ADMIN_EMAIL) {
+    // Enforce authorized admin verification
+    if (!isAuthorizedAdminEmail(payload.email)) {
       console.warn(`[Security Alert] Access denied for unauthorized admin attempt: ${payload.email}`);
       return { valid: false };
     }

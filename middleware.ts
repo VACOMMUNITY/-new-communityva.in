@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 const SESSION_COOKIE_NAME = "cva_admin_session";
 const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || "cva_super_secure_admin_jwt_key_2026_99x7";
-const ALLOWED_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "community.vaofficial@gmail.com").toLowerCase().trim();
+
+const AUTHORIZED_ADMIN_EMAILS = [
+  "paidimarriabhiram@gmail.com",
+  "community.vaofficial@gmail.com",
+  (process.env.ADMIN_EMAIL || "").toLowerCase().trim(),
+].filter(Boolean);
 
 // Web Crypto based HMAC-SHA256 verification (fully Edge & Node compatible)
 async function verifyTokenEdge(token: string | undefined): Promise<boolean> {
@@ -36,7 +41,9 @@ async function verifyTokenEdge(token: string | undefined): Promise<boolean> {
 
     if (Date.now() > payload.exp) return false;
     if (payload.role !== "ADMIN") return false;
-    if (payload.email !== ALLOWED_ADMIN_EMAIL) return false;
+    
+    const emailLower = (payload.email || "").toLowerCase().trim();
+    if (!AUTHORIZED_ADMIN_EMAILS.includes(emailLower)) return false;
 
     return true;
   } catch {
