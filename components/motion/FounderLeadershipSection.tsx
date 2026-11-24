@@ -55,7 +55,7 @@ export default function FounderLeadershipSection() {
                   fill
                   priority
                   unoptimized
-                  className="object-cover object-center"
+                  className="object-cover object-[center_15%]"
                   sizes="(max-width: 768px) 100vw, 450px"
                 />
 
