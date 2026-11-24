@@ -91,6 +91,7 @@ export default function AdminOverviewPage() {
 
   const handleLogout = async () => {
     try {
+      await fetch('/api/auth/logout', { method: 'POST' });
       const supabase = createClient();
       await supabase.auth.signOut();
     } catch (err) {

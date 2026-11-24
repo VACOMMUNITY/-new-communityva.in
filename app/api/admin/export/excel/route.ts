@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateMasterExcelBuffer, generateCategoryExcelBuffer } from "@/lib/export/excel";
+import { isAuthenticatedAdminServer } from "@/lib/auth/admin-session";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
+    // Strict server-side admin check
+    const isAuthorized = await isAuthenticatedAdminServer();
+    if (!isAuthorized) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized. Admin credentials required to export database records." },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const type = (searchParams.get("type") || "all").toLowerCase();
     const eventId = searchParams.get("eventId") || undefined;

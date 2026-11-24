@@ -1,3 +1,4 @@
+import { isAuthenticatedAdminServer } from "@/lib/auth/admin-session";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -12,6 +13,10 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  if (!(await isAuthenticatedAdminServer())) {
+    return NextResponse.json({ success: false, message: "Unauthorized. Admin session required." }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const type = (searchParams.get("type") || "volunteers").toLowerCase();
   const status = searchParams.get("status");

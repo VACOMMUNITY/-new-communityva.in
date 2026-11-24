@@ -94,15 +94,6 @@ export default function CinematicNavbar() {
             </a>
 
             <Link
-              href="/admin"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-neutral-200 text-xs font-mono font-bold text-neutral-700 hover:bg-neutral-50 transition-colors"
-              title="Admin Console"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span className="hidden xl:inline">Admin</span>
-            </Link>
-
-            <Link
               href="/login"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-brand-border text-xs font-mono font-bold uppercase text-brand-dark hover:bg-white transition-colors"
             >
@@ -173,14 +164,6 @@ export default function CinematicNavbar() {
               </Link>
             ))}
             <div className="pt-4 border-t border-brand-border space-y-2">
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-2.5 px-3 rounded-xl bg-neutral-100 border border-neutral-300 text-neutral-800 flex items-center justify-center gap-2 font-bold"
-              >
-                <ShieldCheck className="w-4 h-4 text-blue-600" />
-                <span>Admin Console</span>
-              </Link>
               <a
                 href="https://www.instagram.com/community.va/"
                 target="_blank"

@@ -1,3 +1,4 @@
+import { isAuthenticatedAdminServer } from "@/lib/auth/admin-session";
 import { NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -7,6 +8,10 @@ import { getEvents, getEventRegistrations } from "@/lib/events/store";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  if (!(await isAuthenticatedAdminServer())) {
+    return NextResponse.json({ success: false, message: "Unauthorized. Admin session required." }, { status: 401 });
+  }
+
   try {
     // 1. Try DB queries first
     try {

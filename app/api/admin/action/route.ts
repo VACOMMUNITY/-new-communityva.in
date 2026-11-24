@@ -1,3 +1,4 @@
+import { isAuthenticatedAdminServer } from "@/lib/auth/admin-session";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -5,6 +6,10 @@ import { sendVolunteerStatusEmail, sendCollegeStatusEmail } from "@/lib/email";
 import { updateRegistrationStatus } from "@/lib/store/registrations";
 
 export async function POST(request: NextRequest) {
+  if (!(await isAuthenticatedAdminServer())) {
+    return NextResponse.json({ success: false, message: "Unauthorized. Admin session required." }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const {
