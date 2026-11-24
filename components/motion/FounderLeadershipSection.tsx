@@ -50,7 +50,7 @@ export default function FounderLeadershipSection() {
             <div className="relative rounded-3xl overflow-hidden border border-neutral-200 shadow-md bg-neutral-100">
               <div className="relative aspect-[4/4.7] w-full">
                 <Image
-                  src="/team/paidimarri-abhiram.jpg"
+                  src="/team/paidimarri-abhiram-founder.jpg"
                   alt="Paidimarri Abhiram - Founder & CEO of COMMUNITY.VA"
                   fill
                   priority
