@@ -24,10 +24,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (authError || !authData.user) {
-      // Check if user entered the standard admin or demo accounts when Supabase is in standby mode
+      // Allow admin authentication ONLY if secure environment variables are explicitly configured in the deployment environment
+      const envAdminEmail = process.env.ADMIN_EMAIL;
+      const envAdminPassword = process.env.ADMIN_PASSWORD;
+
       if (
-        (email === "admin@communityva.org" || email === "community.vaofficial@gmail.com") &&
-        password === "Admin@2026"
+        envAdminEmail &&
+        envAdminPassword &&
+        email.toLowerCase().trim() === envAdminEmail.toLowerCase().trim() &&
+        password === envAdminPassword
       ) {
         return NextResponse.json({
           success: true,

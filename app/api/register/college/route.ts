@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { generateApplicationReference } from "@/lib/auth/roles";
 import { sendApplicationReceivedEmail } from "@/lib/email";
 import { saveCollegeRegistration } from "@/lib/store/registrations";
+import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,9 +60,10 @@ export async function POST(request: NextRequest) {
     // 2. Attempt Supabase Auth & DB sync if credentials are configured
     try {
       const adminSupabase = createAdminClient();
+      const generatedPassword = password || crypto.randomBytes(16).toString("hex");
       const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
         email: collegeEmail,
-        password: password || "CvaCollege@2026",
+        password: generatedPassword,
         email_confirm: true,
         user_metadata: { full_name: contactPerson, institution_name: institutionName, role: "COLLEGE" },
       });

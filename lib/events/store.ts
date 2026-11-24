@@ -234,77 +234,7 @@ const inMemoryAttendance: Map<string, StoredAttendanceRecord> =
 // Initialize memory cache
 INITIAL_SEED_EVENTS.forEach(evt => inMemoryEvents.set(evt.id, evt));
 
-// Mock initial registrations for the hackathon
-inMemoryRegistrations.set("evt-01-hackathon", [
-  {
-    id: "reg-01",
-    event_id: "evt-01-hackathon",
-    registration_number: "CVA-EVT-9KA1-2841",
-    participant_name: "Sai Krishna Reddy",
-    participant_email: "saikrishna.dev@gmail.com",
-    participant_phone: "+91 98490 12345",
-    answers: {
-      "College / University Name": "CBIT Hyderabad",
-      "Branch & Year of Study": "CSE / IT — 3rd Year",
-      "Primary Technical Skills": ["Frontend (React/Next.js)", "Backend (Node/Python/Go)"],
-      "GitHub or Portfolio URL": "https://github.com/saikrishna-reddy",
-      "T-Shirt Size for Hackathon Kit": "L"
-    },
-    registration_status: "CONFIRMED",
-    qr_token: "tk_seed_saikrishna_2841",
-    registered_at: "2026-10-28T14:30:00Z",
-    updated_at: "2026-10-28T14:30:00Z",
-    payment: {
-      id: "pay-01",
-      registration_id: "reg-01",
-      event_id: "evt-01-hackathon",
-      amount: 199.00,
-      currency: "INR",
-      payment_method: "UPI",
-      payment_reference: "UPI/329048192847",
-      screenshot_path: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
-      payment_status: "PAYMENT_SUBMITTED",
-      submitted_at: "2026-10-28T14:32:00Z",
-      created_at: "2026-10-28T14:32:00Z",
-      updated_at: "2026-10-28T14:32:00Z"
-    }
-  },
-  {
-    id: "reg-02",
-    event_id: "evt-01-hackathon",
-    registration_number: "CVA-EVT-8L4B-9023",
-    participant_name: "Ananya Rao",
-    participant_email: "ananya.rao.tech@gmail.com",
-    participant_phone: "+91 94401 56789",
-    answers: {
-      "College / University Name": "VNR VJIET",
-      "Branch & Year of Study": "CSE / IT — 2nd Year",
-      "Primary Technical Skills": ["UI/UX & Product Design", "Frontend (React/Next.js)"],
-      "GitHub or Portfolio URL": "https://ananyarao.design",
-      "T-Shirt Size for Hackathon Kit": "M"
-    },
-    registration_status: "CONFIRMED",
-    qr_token: "tk_seed_ananya_9023",
-    registered_at: "2026-10-29T10:15:00Z",
-    updated_at: "2026-10-29T11:00:00Z",
-    payment: {
-      id: "pay-02",
-      registration_id: "reg-02",
-      event_id: "evt-01-hackathon",
-      amount: 199.00,
-      currency: "INR",
-      payment_method: "UPI",
-      payment_reference: "UPI/410294817290",
-      screenshot_path: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
-      payment_status: "PAYMENT_VERIFIED",
-      submitted_at: "2026-10-29T10:16:00Z",
-      verified_at: "2026-10-29T11:00:00Z",
-      verified_by: "Admin",
-      created_at: "2026-10-29T10:16:00Z",
-      updated_at: "2026-10-29T11:00:00Z"
-    }
-  }
-]);
+// Live registrations map starts empty; populated as users register
 
 // -----------------------------------------------------------------------------
 // EVENT METHODS

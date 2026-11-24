@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { generateApplicationReference } from "@/lib/auth/roles";
 import { sendApplicationReceivedEmail } from "@/lib/email";
 import { saveVolunteerRegistration } from "@/lib/store/registrations";
+import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
@@ -64,9 +65,10 @@ export async function POST(request: NextRequest) {
     // 2. Attempt Supabase Auth & DB sync if credentials are configured
     try {
       const adminSupabase = createAdminClient();
+      const generatedPassword = password || crypto.randomBytes(16).toString("hex");
       const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
         email,
-        password: password || "CvaVolunteer@2026",
+        password: generatedPassword,
         email_confirm: true,
         user_metadata: { full_name: fullName, role: "VOLUNTEER" },
       });
